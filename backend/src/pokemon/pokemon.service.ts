@@ -14,29 +14,31 @@ export class PokemonService {
 
     async searchPokemonCards(name: string): Promise<string[]> {
         try {
-        const apiKey = this.configService.get<string>('POKEMON_TCG_API_KEY');
-        if (!apiKey) {
-            throw new HttpException('API Key no configurada', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        const url = `${this.apiUrl}?q=name:${name}`;
-        const headers = { 'X-Api-Key': apiKey };
-
-        const response = await firstValueFrom(this.httpService.get(url, { headers }));
-
-        if (!response.data || !response.data.data.length) {
-            throw new HttpException('No se encontraron cartas', HttpStatus.NOT_FOUND);
-        }
-
-        return response.data.data.map((card: any) => `${card.name}-#${card.number}`);
-        
+            const apiKey = this.configService.get<string>('POKEMON_TCG_API_KEY');
+            if (!apiKey) {
+                throw new HttpException('API Key no configurada', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+    
+            // Hacemos que la búsqueda sea más flexible con '*name*' (como un LIKE en SQL)
+            const url = `${this.apiUrl}?q=name:*${name}*`;
+            const headers = { 'X-Api-Key': apiKey };
+    
+            const response = await firstValueFrom(this.httpService.get(url, { headers }));
+    
+            if (!response.data || !response.data.data.length) {
+                throw new HttpException('No se encontraron cartas', HttpStatus.NOT_FOUND);
+            }
+    
+            return response.data.data.map((card: any) => `${card.name}-#${card.number}`);
+            
         } catch (error) {
-        throw new HttpException(
-            'Error al buscar cartas de Pokémon',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+            throw new HttpException(
+                'Error al buscar cartas de Pokémon',
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
         }
     }
+
     async getPokemonCardDetailsByNumber(name: string, number: string): Promise<{ nombre: string; numero: string; imagen: string; valor_actual: string; valor_minimo: string; valor_reversa: string; valor_maximo: string; }> {
         try {
         const apiKey = this.configService.get<string>('POKEMON_TCG_API_KEY');
@@ -57,8 +59,8 @@ export class PokemonService {
         if (!card) {
             throw new HttpException('No se encontró la carta con ese número', HttpStatus.NOT_FOUND);
         }
-        console.log(card.cardmarket);
-        console.log(card.cardmarket?.prices?.trendPrice);
+        // console.log(card.cardmarket);
+        // console.log(card.cardmarket?.prices?.trendPrice);
 
         return {
             nombre: `${card.name} ${card.number}`,

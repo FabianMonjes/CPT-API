@@ -1,11 +1,23 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import '../styles/global.css'; // importante
+import Navbar from '../components/Navbar.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SearchPokemon from '../components/SearchPokemon.jsx';
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PokeFinder</title>
+  </head>
+  <body class="font-sans min-h-screen flex flex-col bg-gradient-to-b from-black via-gray-900 to-purple-900 text-white">
+    <Navbar />
+    <Header />
+    <hr class="border-t border-white/10 mx-auto w-4/5 my-2" />
+    <main id="buscar" class="flex-grow">
+      <SearchPokemon client:load />
+    </main>
+    <Footer />
+  </body>
+</html>

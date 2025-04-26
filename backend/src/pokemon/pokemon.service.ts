@@ -12,8 +12,13 @@ export class PokemonService {
         private readonly configService: ConfigService,
     ) {}
 
-    async searchPokemonCards(name: string): Promise<string[]> {
+    async searchPokemonCards(name: string): Promise<{ result: string[]; status: number }> {
         try {
+            if (!name) {
+                throw new HttpException('Nombre no proporcionado', HttpStatus.BAD_REQUEST);
+
+            }
+
             const apiKey = this.configService.get<string>('POKEMON_TCG_API_KEY');
             if (!apiKey) {
                 throw new HttpException('API Key no configurada', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -28,14 +33,18 @@ export class PokemonService {
             if (!response.data || !response.data.data.length) {
                 throw new HttpException('No se encontraron cartas', HttpStatus.NOT_FOUND);
             }
-    
-            return response.data.data.map((card: any) => `${card.name}-#${card.number}`);
+            return {
+                result: response.data.data.map((card: any) => `${card.name}-#${card.number}`),
+                status: HttpStatus.OK,
+            };
             
         } catch (error) {
+            console.log(error);
             throw new HttpException(
                 'Error al buscar cartas de Pokémon',
                 HttpStatus.INTERNAL_SERVER_ERROR,
             );
+            
         }
     }
 

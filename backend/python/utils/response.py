@@ -3,12 +3,11 @@ import traceback
 from fastapi.responses import JSONResponse
 
 # Respuesta exitosa - status dinámico
-def formato_respuesta(valores, status_code=200, msg="Solicitud exitosa"):
+def formato_respuesta(valores, msg="Solicitud exitosa", status_code=200, ):
     try:
         return JSONResponse(
             content={
                 "resultado": valores,
-                "total": len(valores) if isinstance(valores, (list, tuple)) else 1,
                 "message": msg,
                 "status": status_code
             },

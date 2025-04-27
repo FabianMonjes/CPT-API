@@ -21,7 +21,8 @@ app.add_middleware(
 # app.include_router(tokenRout, tags=["Token"])
 app.include_router(index, tags=["Index"])
 logger.info("...Levantando Api 🦖")
+
 for route in app.routes:
     logger.info(route.path)
-
+logger.info("...Api levantada con exito 🦖 raw!!!")
 # pm2 start "uvicorn main:app --host 192.168.66.140 --port 9040" --name "api_om:9040" --watch

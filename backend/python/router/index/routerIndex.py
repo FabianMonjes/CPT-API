@@ -8,7 +8,7 @@ import json
 index  = APIRouter()
 
 @index.get("/")
-async def root():
+async def base():
     api_details = {
         "name": "Mi API Genial",
         "version": "1.0.0",  # Esto puedes cambiarlo dinámicamente si tienes un archivo setup.py
@@ -20,13 +20,9 @@ async def root():
     return JSONResponse(content=api_details)
 
 
-@index.get("/BusquedaPokemon/{nombre}")
-async def buscar_pokemons(nombre:str):
+@index.get("/BusquedaPokemon/{pokemon}")
+async def buscar_pokemons(pokemon:str):
     try:
-        
-        
-        
-        print("Hola")
-        return {"Result": "Hola"}
+        return formato_respuesta({"pokemon1": "pikachu", "pokemon2": "charmander"}, "Busqueda exitosa")
     except Exception as e:
-        return manejo_errores(e, "Error al obtener data /login", "loginRouter")
+        return  manejo_errores(e, "Error", "buscar_pokemons")

@@ -1,24 +1,35 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const useApi = (url, method = 'GET') => {
-    const [data, setData]       = useState(null);
+const useApi = (baseUrl, method = 'GET') => {
+    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError]     = useState(null);
+    const [error, setError] = useState(null);
+
     const fetchData = async (params = {}) => {
         setLoading(true);
         try {
-            const response = await axios({
-                method,
-                url,
-                params,
-            });
-            console.log(response);
-            setData(response.data);
+            const { pokemon } = params;
+        if (!pokemon) {
+            throw new Error("Se requiere el nombre del Pokémon");
+        }
+
+        // 🔥 Ahora construimos bien la URL
+        const url = `${baseUrl}${encodeURIComponent(pokemon)}`;
+
+        const response = await axios({
+            method,
+            url,
+        });
+
+        console.log("Respuesta completa:", response);
+
+        const cartas = response.data?.resultado?.Cartas || {};
+        setData({ pokemons: cartas });
         } catch (err) {
-            setError(err);
+        setError(err);
         } finally {
-            setLoading(false);
+        setLoading(false);
         }
     };
 

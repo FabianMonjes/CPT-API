@@ -1,9 +1,13 @@
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.responses import JSONResponse
 import hashlib
 from utils.response import manejo_errores, formato_respuesta
 from datetime import datetime
 import json
+import httpx
+from dotenv import load_dotenv
+import os
+from loguru import logger
 
 index  = APIRouter()
 
@@ -21,8 +25,63 @@ async def base():
 
 
 @index.get("/BusquedaPokemon/{pokemon}")
-async def buscar_pokemons(pokemon:str):
+async def buscar_pokemons(pokemon: str):
+    load_dotenv()
+    
+    API_URL = os.getenv("POKEMON_TCG_API_URL")
+    API_KEY = os.getenv("POKEMON_TCG_API_KEY")
+    
     try:
-        return formato_respuesta({"pokemon1": "pikachu", "pokemon2": "charmander"}, "Busqueda exitosa")
+        if not pokemon:
+            raise HTTPException(status_code=400, detail="Nombre no proporcionado")
+        
+        if not API_KEY:
+            raise HTTPException(status_code=500, detail="API Key no configurada")
+        
+        headers = {
+            "X-Api-Key": API_KEY
+        }
+        parts = pokemon.split()
+        if len(parts) >= 2 and parts[-1].isdigit():
+            # Si el último fragmento es un número -> filtramos por name Y number
+            number = parts[-1]
+            name = " ".join(parts[:-1])
+            url = f"{API_URL}?q=name:\"{name}\" number:{number}"
+        else:
+            # Solo por nombre
+            name = pokemon
+            url = f"{API_URL}?q=name:*{name}*"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Error al consultar la API de Pokémon")
+        
+        data = response.json()
+        
+        if not data.get("data"):
+            raise HTTPException(status_code=404, detail="No se encontraron cartas")
+
+        pokemons = {}
+        for card in data["data"]:
+            name = card["name"]
+            number = card["number"]
+            key = f"{name}-{number}"
+            pokemons[key] = {
+                "nombre_carta": name,
+                "numero": number
+            }
+        
+        return formato_respuesta(
+            {
+                "Cartas": pokemons
+            },
+            "Búsqueda exitosa"
+        )
+    
+    except HTTPException as http_error:
+        logger.error(f"HTTPException: {http_error.detail}")
+        raise http_error
     except Exception as e:
-        return  manejo_errores(e, "Error", "buscar_pokemons")
+        return manejo_errores(e, "Error al buscar cartas de Pokémon", "buscar_pokemons")

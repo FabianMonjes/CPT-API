@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
 const slides = [
-  {
-    title: "Consulta en Tiempo Real",
-    img: "pikachu_header.gif",
-    color: "text-yellow-400",
-    description: "Encuentra el valor actual de tus cartas Pokémon y mantente siempre informado."
-  },
+  // {
+  //   title: "Consulta en Tiempo Real",
+  //   img: "pikachu_header.gif",
+  //   color: "text-yellow-400",
+  //   description: "Encuentra el valor actual de tus cartas Pokémon y mantente siempre informado."
+  // },
   {
     title: "Tu Billetera Virtual Pokémon",
     img: "gengar_header.gif",

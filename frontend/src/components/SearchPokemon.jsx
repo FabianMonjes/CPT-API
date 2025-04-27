@@ -1,82 +1,120 @@
 import { useState, useEffect } from 'react';
 import useApi from '../hooks/useApi';
-import { Search } from "lucide-react"; // Puedes usar Heroicons, FontAwesome o cualquier ícono SVG también
+import { Search } from "lucide-react";
 
 export default function SearchPokemon() {
-    const [query, setQuery] = useState("");
-    const [searchText, setSearchText] = useState('');
-    const { data, loading, fetchData } = useApi('http://localhost:3000/pokemon/cards/');
+  const [query, setQuery] = useState("");
+  const { data, loading, fetchData } = useApi('http://localhost:8009/BusquedaPokemon/');
+  
+  // Estado para controlar el debounce
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
 
-
-    useEffect(() => {
-      if (query.length >= 3) {
-        fetchData({ name:query });
+  useEffect(() => {
+    if (query.length >= 3) {
+      // Limpiamos el timeout anterior si existe
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
       }
-    }, [query]);
 
-    const handleSelectCard = (card) => {
-      console.log(`Seleccionaste: ${card.name} - #${card.number}`);
+      // Establecemos un nuevo timeout
+      const timeout = setTimeout(() => {
+        fetchData({ pokemon: query });
+      }, 500); // Espera 500ms después de que el usuario deje de escribir
+
+      setDebounceTimeout(timeout); // Guardamos el timeout para limpiar en el siguiente cambio
+    }
+
+    // Limpiar el timeout cuando el componente se desmonte
+    return () => {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
     };
+  }, [query]);
 
-    const handleChange = (e) => {
-        const name = e.target.value;
-        setQuery(name);
-    };
+  const handleSelectCard = (card) => {
+    console.log(`Seleccionaste: ${card.nombre_carta} - #${card.numero}`);
+  };
 
-return (
-  <>
-    <h1 className="text-4xl font-bold text-center text-purple-400">
-      Busca tu carta Pokémon
-    </h1>
-    <p className="text-lg text-center text-gray-300 mb-8">
-      Encuentra el valor actual de tus cartas Pokémon y mantente siempre informado.
-    </p>
-    <div className="flex justify-center items-center py-10">
-      <div className="relative w-full max-w-3xl">
-        <input
-          type="text"
-          placeholder="Busca tu carta"
-          value={query}
-          onChange={handleChange}
-          className="w-full pl-14 pr-6 py-4 rounded-full bg-white/10 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-500 transition duration-200 text-lg"
-        />
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-          <Search size={24} />
-        </div>
-        {loading && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-            <svg
-              className="animate-spin w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-              />
-              <path fill="currentColor" d="M4 12h16" />
-            </svg>
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+  };
+
+  // Adaptamos aquí: como `data.pokemons` ahora es un objeto, lo transformamos en array
+  const pokemonsArray = data?.pokemons ? Object.values(data.pokemons) : [];
+
+  return (
+    <>
+      <h1 className="text-4xl font-bold text-center text-purple-400">
+        Busca tu carta Pokémon
+      </h1>
+      <p className="text-lg text-center text-gray-300 mb-8">
+        Encuentra el valor actual de tus cartas Pokémon y mantente siempre informado.
+      </p>
+      <div className="flex justify-center items-center py-10">
+        <div className="relative w-full max-w-3xl">
+          <input
+            type="text"
+            placeholder="Busca tu carta"
+            value={query}
+            onChange={handleChange}
+            className="w-full pl-14 pr-6 py-4 rounded-full bg-white/10 text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-500 transition duration-200 text-lg"
+            disabled={loading}
+          />
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <Search size={24} />
           </div>
-        )}
-        {data && data.length > 0 && (
-          <ul className="mt-4 bg-white/10 rounded-lg p-4 text-white">
-            {data.map((card) => (
+
+          {loading && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <svg
+                className="animate-spin w-6 h-6"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path fill="currentColor" d="M4 12h16" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mejorado: Cargando... */}
+      {loading && (
+        <div className="text-center mt-4">
+          <p className="text-xl text-gray-400 animate-pulse">Cargando...</p>
+        </div>
+      )}
+
+      {/* Mostrar "Resultados probablemente" después de Cargando */}
+      {!loading && pokemonsArray.length > 0 && (
+        <div className="text-center mt-4">
+          <p className="text-lg text-gray-300">Resultados probablemente</p>
+        </div>
+      )}
+
+      {/* Lista de resultados debajo del input */}
+      {pokemonsArray.length > 0 && (
+          <ul className="mt-2 bg-white/10 rounded-lg p-2 text-white max-h-[150px] overflow-y-auto w-full">
+            {pokemonsArray.map((card, index) => (
               <li
-                key={card.id}
-                className="py-2 px-4 hover:bg-purple-500 rounded-lg cursor-pointer transition duration-200"
+                key={`${card.nombre_carta}-${card.numero}-${index}`}
+                className="py-1 px-3 hover:bg-purple-500 rounded-lg cursor-pointer transition duration-200"
                 onClick={() => handleSelectCard(card)}
               >
-                {card.name} - #{card.number}
+                {card.nombre_carta} - #{card.numero}
               </li>
             ))}
           </ul>
-        )}
-      </div>
-    </div>
-  </>
-);
+      )}
+    </>
+  );
 }

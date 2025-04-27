@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 
 # Manejador global de excepciones HTTP
 async def http_exception_handler(request, exc: HTTPException):
+    
     return JSONResponse(
         content={
             "message": exc.detail,

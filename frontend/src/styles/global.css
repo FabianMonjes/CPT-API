@@ -12,3 +12,17 @@
 ::-webkit-scrollbar-track {
   background-color: transparent; /* Fondo del track */
 }
+
+@keyframes gradientRotation {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+.group-hover\:animate-gradient {
+  animation: gradientRotation 2s infinite;
+  background-size: 200% 200%;
+}

@@ -1,53 +1,49 @@
-import { useState } from 'react';
-const [zoomOpen, setZoomOpen] = useState(false);
-
 const SearchCard = ({ detalle }) => {
-        if (!detalle) return null;
-    
-        const {
-            nombre,
-            numero,
-            imagen,
-            valor_actual,
-            valor_minimo,
-            valor_reversa,
-            valor_maximo
-        } = detalle;
-        return (
-        <div className="flex flex-col items-center mt-6 bg-gradient-to-br from-purple-900/30 via-purple-800/30 to-purple-900/30 rounded-xl p-6 w-full max-w-3xl mx-auto shadow-2xl border border-purple-500/30 backdrop-blur-md">
-            <h2 className="text-2xl text-purple-200 font-bold mb-4 drop-shadow-lg">
-            {nombre}
-            </h2>
-            <div className="flex flex-col md:flex-row w-full gap-6 items-center md:items-start">
-            {/* Imagen a la izquierda */}
-            <div className="w-80 h-auto flex justify-center neon-glow transition-transform duration-300 hover:scale-105 hover:-translate-y-1">
-                <img
-                    src={imagen}
-                    alt={nombre}
-                    className="w-full h-auto rounded-lg border-4 border-purple-500 shadow-[0_0_25px_8px_rgba(168,85,247,0.6)]"
-                />
+    if (!detalle) return null;
+
+    const {
+        nombre,
+        numero,
+        imagen,
+        valor_actual,
+        valor_minimo,
+        valor_reversa,
+        valor_maximo
+    } = detalle;
+
+    return (
+    <div className="flex flex-col items-center mt-6 bg-white/5 rounded-lg p-4 w-full max-w-3xl mx-auto shadow-lg">
+        <h2 className="text-xl text-purple-300 font-semibold mb-2">
+        {nombre} - #{numero}
+        </h2>
+        <div className="flex flex-col md:flex-row w-full gap-4">
+        {/* Imagen a la izquierda */}
+        <div className="flex justify-center md:justify-start w-full md:w-1/3">
+            <img src={imagen} alt={nombre} className="w-48 h-auto rounded-lg border border-purple-400" />
+        </div>
+
+        {/* Valores a la derecha */}
+        <div className="grid grid-cols-2 gap-4 w-full md:w-2/3">
+            <div className="bg-purple-800/30 p-3 rounded-lg text-white text-center">
+            <p className="text-sm text-purple-300">Actual</p>
+            <p className="text-lg font-bold">${valor_actual}</p>
             </div>
-            {/* Valores a la derecha */}
-            <div className="grid grid-cols-2 gap-4 w-full md:w-2/3">
-                {[
-                { label: "Actual", value: valor_actual },
-                { label: "Mínimo", value: valor_minimo },
-                { label: "Reversa", value: valor_reversa },
-                { label: "Máximo", value: valor_maximo }
-                ].map((item, idx) => (
-                <div
-                    key={idx}
-                    className="bg-purple-900/50 p-4 rounded-xl text-white text-center shadow-lg border border-purple-500/30 hover:scale-105 transition-transform duration-300"
-                >
-                    <p className="text-sm text-purple-300">{item.label}</p>
-                    <p className="text-lg font-bold text-purple-100">${item.value}</p>
-                </div>
-                ))}
+            <div className="bg-purple-800/30 p-3 rounded-lg text-white text-center">
+            <p className="text-sm text-purple-300">Mínimo</p>
+            <p className="text-lg font-bold">${valor_minimo}</p>
             </div>
+            <div className="bg-purple-800/30 p-3 rounded-lg text-white text-center">
+            <p className="text-sm text-purple-300">Reversa</p>
+            <p className="text-lg font-bold">${valor_reversa}</p>
+            </div>
+            <div className="bg-purple-800/30 p-3 rounded-lg text-white text-center">
+            <p className="text-sm text-purple-300">Máximo</p>
+            <p className="text-lg font-bold">${valor_maximo}</p>
             </div>
         </div>
-        );
-    };
-    
-    export default SearchCard;
-  
+        </div>
+    </div>
+    );
+};
+
+export default SearchCard;

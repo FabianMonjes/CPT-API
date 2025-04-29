@@ -28,8 +28,6 @@ const useApiFlexible = (baseBaseUrl, method = 'GET') => {
             url,
         });
 
-        console.log("Respuesta completa (flexible 2.0):", response);
-
         const resultado = response.data?.resultado || {};
 
         if (resultado.Cartas) {

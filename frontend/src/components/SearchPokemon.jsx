@@ -36,8 +36,8 @@ export default function SearchPokemon() {
 
   const handleSelectCard = async  (card) => {
     const result = await fetchData({ pokemon: card.nombre_carta, id: card.numero });
-    console.log('aqui',result)
-    setDetalle(result);
+    console.log('RESPUESTA : ',result)
+    setDetalle(result.Dato);
   };
 
   const handleChange = (e) => {

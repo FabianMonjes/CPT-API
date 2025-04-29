@@ -4,7 +4,7 @@ import hashlib
 from utils.response import manejo_errores, formato_respuesta
 from datetime import datetime
 import json
-import httpx
+import requests
 from dotenv import load_dotenv
 import os
 from loguru import logger
@@ -52,9 +52,7 @@ async def buscar_pokemons(pokemon: str):
             name = pokemon
             url = f"{API_URL}?q=name:*{name}*"
         
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers)
-            logger.warning(response)
+            response = requests.get(url, headers=headers)
         
         if response.status_code != 200:
             raise HTTPException(status_code=500, detail="Error al consultar la API de Pokémon")
@@ -107,9 +105,8 @@ async def buscar_pokemon_detalle(nombre_carta: str, numero: str):
         url = f'{API_URL}?q=name:"{nombre_carta}" number:{numero}'
         headers = {'X-Api-Key': API_KEY}
         
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers)
-            response.raise_for_status()
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # sigue funcionando igual
         
         data = response.json()
         

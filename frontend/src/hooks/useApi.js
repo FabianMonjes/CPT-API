@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const useApi = (baseUrl, method = 'GET') => {
+const useApiFlexible = (baseBaseUrl, method = 'GET') => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -9,23 +9,37 @@ const useApi = (baseUrl, method = 'GET') => {
     const fetchData = async (params = {}) => {
         setLoading(true);
         try {
-            const { pokemon } = params;
+        const { pokemon, id } = params;
+
         if (!pokemon) {
-            throw new Error("Se requiere el nombre del Pokémon");
+            throw new Error("Se requiere al menos el nombre del Pokémon");
         }
 
-        // 🔥 Ahora construimos bien la URL
-        const url = `${baseUrl}${encodeURIComponent(pokemon)}`;
+        // 🛠️ Ahora construir bien el endpoint según si hay ID
+        let url = '';
+        if (id !== undefined && id !== null) {
+            url = `${baseBaseUrl}BusquedaPokemonDetalle/${encodeURIComponent(pokemon)}/${encodeURIComponent(id)}`;
+        } else {
+            url = `${baseBaseUrl}BusquedaPokemon/${encodeURIComponent(pokemon)}`;
+        }
 
         const response = await axios({
             method,
             url,
         });
 
-        console.log("Respuesta completa:", response);
+        console.log("Respuesta completa (flexible 2.0):", response);
 
-        const cartas = response.data?.resultado?.Cartas || {};
-        setData({ pokemons: cartas });
+        const resultado = response.data?.resultado || {};
+
+        if (resultado.Cartas) {
+            setData({ pokemons: resultado.Cartas });
+        } else if (resultado.Carta) {
+            setData({ detalle: resultado });
+        } else {
+            setData({ resultado });
+        }
+        return resultado;
         } catch (err) {
         setError(err);
         } finally {
@@ -41,4 +55,4 @@ const useApi = (baseUrl, method = 'GET') => {
     };
 };
 
-export default useApi;
+export default useApiFlexible;

@@ -54,6 +54,7 @@ async def buscar_pokemons(pokemon: str):
         
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=headers)
+            logger.warning(response)
         
         if response.status_code != 200:
             raise HTTPException(status_code=500, detail="Error al consultar la API de Pokémon")
@@ -119,7 +120,7 @@ async def buscar_pokemon_detalle(nombre_carta: str, numero: str):
         if not card:
             raise HTTPException(status_code=404, detail="No se encontró la carta con ese número")
         
-        return {
+        data = {
             "nombre": f"{card['name']} {card['number']}",
             "numero": card['number'],
             "imagen": card['images'].get('large') or card['images'].get('small', ''),
@@ -128,6 +129,12 @@ async def buscar_pokemon_detalle(nombre_carta: str, numero: str):
             "valor_reversa": card.get('cardmarket', {}).get('prices', {}).get('reverseHoloTrend', ''),
             "valor_maximo": card.get('cardmarket', {}).get('prices', {}).get('avg30', '')
         }
+        return formato_respuesta(
+            {
+                "Dato": data
+            },
+            "Búsqueda exitosa"
+        )
     except HTTPException as http_error:
         logger.error(f"HTTPException: {http_error.detail}")
         raise http_error

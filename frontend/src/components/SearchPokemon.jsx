@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import useApi from '../hooks/useApi';
+import useApiFlexible from '../hooks/useApi';
 import { Search } from "lucide-react";
+import SearchCard from './SearchCard.jsx';
+
 
 export default function SearchPokemon() {
   const [query, setQuery] = useState("");
-  const { data, loading, fetchData } = useApi('http://localhost:8009/BusquedaPokemon/');
-  
+  const { data , loading, fetchData } = useApiFlexible('http://localhost:8009/');
+  const [detalle, setDetalle] = useState(null)
   // Estado para controlar el debounce
   const [debounceTimeout, setDebounceTimeout] = useState(null);
 
@@ -32,8 +34,10 @@ export default function SearchPokemon() {
     };
   }, [query]);
 
-  const handleSelectCard = (card) => {
-    console.log(`Seleccionaste: ${card.nombre_carta} - #${card.numero}`);
+  const handleSelectCard = async  (card) => {
+    const result = await fetchData({ pokemon: card.nombre_carta, id: card.numero });
+    console.log('aqui',result)
+    setDetalle(result);
   };
 
   const handleChange = (e) => {
@@ -86,35 +90,34 @@ export default function SearchPokemon() {
           )}
         </div>
       </div>
-
       {/* Mejorado: Cargando... */}
       {loading && (
         <div className="text-center mt-4">
           <p className="text-xl text-gray-400 animate-pulse">Cargando...</p>
         </div>
       )}
-
-      {/* Mostrar "Resultados probablemente" después de Cargando */}
-      {!loading && pokemonsArray.length > 0 && (
-        <div className="text-center mt-4">
-          <p className="text-lg text-gray-300">Resultados probablemente</p>
-        </div>
-      )}
-
       {/* Lista de resultados debajo del input */}
       {pokemonsArray.length > 0 && (
-          <ul className="mt-2 bg-white/10 rounded-lg p-2 text-white max-h-[150px] overflow-y-auto w-full">
+        <>
+        <h5 className="text-4xl font-bold text-center text-purple-400 mb-3">Resultado</h5>
+        <div className="flex justify-center items-center relative w-full px-4">
+          <ul className="mt-0 bg-white/10 rounded-lg p-2 text-white max-h-[150px] overflow-y-auto flex flex-col items-center w-[768px]">
             {pokemonsArray.map((card, index) => (
               <li
                 key={`${card.nombre_carta}-${card.numero}-${index}`}
-                className="py-1 px-3 hover:bg-purple-500 rounded-lg cursor-pointer transition duration-200"
+                className="py-1 px-3 hover:bg-purple-500 rounded-lg cursor-pointer transition duration-200 w-full text-center"
                 onClick={() => handleSelectCard(card)}
               >
                 {card.nombre_carta} - #{card.numero}
               </li>
             ))}
           </ul>
+        </div></>
       )}
+
+      {/* Aquí mostramos el detalle de la carta seleccionada */}
+      {detalle && <SearchCard detalle={detalle}/>}
+
     </>
   );
 }

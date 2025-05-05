@@ -52,9 +52,10 @@ async def buscar_pokemons(pokemon: str):
             name = pokemon
             url = f"{API_URL}?q=name:*{name}*"
         
-            response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers)
         
         if response.status_code != 200:
+            logger.error(f"Error al consultar la API de Pokémon: {response.status_code} - {response.text}")
             raise HTTPException(status_code=500, detail="Error al consultar la API de Pokémon")
         
         data = response.json()
@@ -88,7 +89,6 @@ async def buscar_pokemons(pokemon: str):
 @index.get("/BusquedaPokemonDetalle/{nombre_carta}/{numero}")
 async def buscar_pokemon_detalle(nombre_carta: str, numero: str):
     try:
-        print(f"Nombre de carta: {nombre_carta}, Número: {numero}")
         load_dotenv()   
         API_URL = os.getenv("POKEMON_TCG_API_URL")
         API_KEY = os.getenv("POKEMON_TCG_API_KEY")
@@ -116,15 +116,35 @@ async def buscar_pokemon_detalle(nombre_carta: str, numero: str):
         
         if not card:
             raise HTTPException(status_code=404, detail="No se encontró la carta con ese número")
+        print(card.get('tcgplayer', {}))
         
+        ediciones = {}
+        for tipo, valores in card.get('tcgplayer', {}).get('prices', {}).items():
+            if not isinstance(valores, dict):
+                continue
+
+            direct_low = valores.get("directLow")
+            market = valores.get("market")
+
+            if direct_low is not None:
+                ediciones[tipo] = {"valor": direct_low}
+            elif market is not None:
+                ediciones[tipo] = {"valor": market}
+
+        # Valor destacado puede ser el primero que exista
+        valor_destacado = next(
+            (v["valor"] for v in ediciones.values() if v.get("valor")), ''
+        )
         data = {
             "nombre": f"{card['name']} {card['number']}",
             "numero": card['number'],
             "imagen": card['images'].get('large') or card['images'].get('small', ''),
-            "valor_actual": card.get('cardmarket', {}).get('prices', {}).get('trendPrice', ''),
-            "valor_minimo": card.get('cardmarket', {}).get('prices', {}).get('lowPriceExPlus', ''),
-            "valor_reversa": card.get('cardmarket', {}).get('prices', {}).get('reverseHoloTrend', ''),
-            "valor_maximo": card.get('cardmarket', {}).get('prices', {}).get('avg30', '')
+            "valor_actual": valor_destacado,
+            "rareza": card.get('rarity', ''),
+            "set": card.get('set', {}).get('name', ''),
+            "set_series": card.get('set', {}).get('series', ''),
+            "url_tcgplayer": card.get('tcgplayer', {}).get('url', ''),
+            "precios_ediciones": ediciones
         }
         return formato_respuesta(
             {

@@ -26,3 +26,54 @@
   animation: gradientRotation 2s infinite;
   background-size: 200% 200%;
 }
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #a855f7;
+  width: 0;
+  animation: typewriter 2s steps(40) forwards;
+}
+
+@keyframes card-reveal {
+  0% {
+    transform: scale(0.6) rotateY(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0.8) rotateY(180deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1) rotateY(360deg);
+    opacity: 1;
+  }
+}
+
+.animate-card {
+  animation: card-reveal 1s ease-in-out;
+}
+
+@keyframes fade-in-num {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-num {
+  animation: fade-in-num 0.8s ease-out forwards;
+}

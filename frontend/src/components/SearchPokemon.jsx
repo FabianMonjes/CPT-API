@@ -34,10 +34,11 @@ export default function SearchPokemon() {
     };
   }, [query]);
 
-  const handleSelectCard = async  (card) => {
+  const handleSelectCard = async (card) => {
     const result = await fetchData({ pokemon: card.nombre_carta, id: card.numero });
-    console.log('RESPUESTA : ',result)
+    console.log('RESPUESTA : ', result);
     setDetalle(result.Dato);
+    setQuery(""); // Limpiamos el input
   };
 
   const handleChange = (e) => {

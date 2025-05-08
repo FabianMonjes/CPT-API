@@ -1,6 +1,7 @@
 from loguru import logger
 import traceback
 from fastapi.responses import JSONResponse
+from fastapi import  HTTPException
 
 # Respuesta exitosa - status dinámico
 def formato_respuesta(valores, msg="Solicitud exitosa", status_code=200, ):
@@ -36,3 +37,11 @@ def manejo_errores(error, msg, endpoints, status_code=500):
             content={"message": "Error al procesar el error." + str(e)},
             status_code=500
         )
+        
+def handle_exception(detail, status_code=500):
+    try:
+        logger.error(f"Error: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=400, detail=detail)
+    except Exception as e:
+        return manejo_errores(e, "Error al procesar la excepción", "handle_exception")

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.responses import JSONResponse
 import hashlib
-from utils.response import manejo_errores, formato_respuesta
+from utils.response import manejo_errores, formato_respuesta, handle_exception
 from datetime import datetime
 import json
 import requests
@@ -33,10 +33,10 @@ async def buscar_pokemons(pokemon: str):
     
     try:
         if not pokemon:
-            raise HTTPException(status_code=400, detail="Nombre no proporcionado")
+            handle_exception("Nombre no proporcionado", 400)
         
         if not API_KEY:
-            raise HTTPException(status_code=500, detail="API Key no configurada")
+            handle_exception("API Key no configurada", 500)
         
         headers = {
             "X-Api-Key": API_KEY
@@ -56,12 +56,12 @@ async def buscar_pokemons(pokemon: str):
         
         if response.status_code != 200:
             logger.error(f"Error al consultar la API de Pokémon: {response.status_code} - {response.text}")
-            raise HTTPException(status_code=500, detail="Error al consultar la API de Pokémon")
+            handle_exception("Error al consultar la API de Pokémon", 500)
         
         data = response.json()
         
         if not data.get("data"):
-            raise HTTPException(status_code=404, detail="No se encontraron cartas")
+            handle_exception("No se encontraron cartas", 404)
 
         pokemons = {}
         for card in data["data"]:

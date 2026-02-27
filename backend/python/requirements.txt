@@ -1,5 +1,5 @@
 annotated-types==0.7.0
-Pillow==11.1.0
+Pillow==12.1.1
 pytesseract==0.3.13
 anyio==3.6.2
 asgiref==3.4.1

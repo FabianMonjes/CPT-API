@@ -1,0 +1,20 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import WebcamRecognition from '../components/WebcamRecognition.jsx';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PokeFinder – Reconocimiento por Cámara</title>
+  </head>
+  <body class="font-sans min-h-screen flex flex-col bg-gradient-to-b from-black via-gray-900 to-purple-900 text-white">
+    <Navbar />
+    <main class="flex-grow">
+      <WebcamRecognition client:load />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from router.index.routerIndex import index
+from router.recognition.recognitionRouter import recognition
 from loguru import logger
 
 from fastapi.exceptions import HTTPException
@@ -20,6 +21,7 @@ app.add_middleware(
 # app.include_router(amos, tags=["Amos"], dependencies=[Depends(verify_token)])
 # app.include_router(tokenRout, tags=["Token"])
 app.include_router(index, tags=["Index"])
+app.include_router(recognition, tags=["Recognition"])
 logger.info("...Levantando Api 🦖")
 
 for route in app.routes:
